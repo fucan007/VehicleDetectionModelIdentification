@@ -47,17 +47,23 @@ def dict_to_tf_example(example , image_dir,annotations):
     key = hashlib.sha256(encoded_jpg).hexdigest()
     image_width = image.size[0]
     image_height = image.size[1]
+    print ('image_width',image_width)
+    print ('image_height',image_height)
+    image_class = []
 
     xmins = []
     ymins = []
     xmaxs = []
     ymaxs = []
-    image_class = []
 
     xmin = annotations[0][0][0]
-    xmax = annotations[1][0][0]
-    ymin = annotations[2][0][0]
+    ymin = annotations[1][0][0]
+    xmax = annotations[2][0][0]
     ymax = annotations[3][0][0]
+    print ('annotations[0][0][0]',annotations[0][0][0])
+    print ('annotations[1][0][0]',annotations[1][0][0])
+    print ('annotations[2][0][0]',annotations[2][0][0])
+    print ('annotations[3][0][0]',annotations[3][0][0])
     image_class = annotations[4][0][0]
     image_filename = annotations[5][0]
     print ('filename',image_filename)
@@ -66,6 +72,10 @@ def dict_to_tf_example(example , image_dir,annotations):
     ymins.append(ymin / image_height)
     xmaxs.append(xmax / image_width)
     ymaxs.append(ymax / image_height)
+    print ('xmins:',xmins)
+    print ('ymins:',ymins)
+    print ('xmaxs:',xmaxs)
+    print ('ymaxs:',ymaxs)
 
     feature_dict = {
         'image/height': dataset_util.int64_feature(image_height),
