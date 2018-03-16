@@ -64,10 +64,11 @@ def dict_to_tf_example(example , image_dir,annotations):
     print ('annotations[1][0][0]',annotations[1][0][0])
     print ('annotations[2][0][0]',annotations[2][0][0])
     print ('annotations[3][0][0]',annotations[3][0][0])
-    image_class = annotations[4][0][0]
+    image_class.append(int(annotations[4][0][0]))
     image_filename = annotations[5][0]
     print ('filename',image_filename)
     print ('image_class',image_class)
+    print ('the type of image_class',type(image_class))
     xmins.append(xmin / image_width)
     ymins.append(ymin / image_height)
     xmaxs.append(xmax / image_width)
@@ -91,7 +92,7 @@ def dict_to_tf_example(example , image_dir,annotations):
         'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
         'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
         'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
-        'image/object/class/label': dataset_util.int64_feature(int(image_class)),
+        'image/object/class/label': dataset_util.int64_list_feature(image_class),
     }
     tf_example = tf.train.Example(features=tf.train.Features(feature=feature_dict))
     return tf_example
