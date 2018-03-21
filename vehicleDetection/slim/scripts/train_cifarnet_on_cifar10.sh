@@ -25,18 +25,18 @@
 set -e
 
 # Where the checkpoint and logs will be saved to.
-TRAIN_DIR=/tmp/cifarnet-model
+TRAIN_DIR=/home/xiaohui/AI/VehicleDetectionModelIdentification/vehicleDetection/slim/cifarnet-model
 
 # Where the dataset is saved to.
-DATASET_DIR=/tmp/cifar10
+DATASET_DIR=/home/xiaohui/AI/VehicleDetectionModelIdentification/vehicleDetection/slim/cifar10
 
 # Download the dataset
-python download_and_convert_data.py \
+python3 ../download_and_convert_data.py \
   --dataset_name=cifar10 \
   --dataset_dir=${DATASET_DIR}
 
 # Run training.
-python train_image_classifier.py \
+python3 ../train_image_classifier.py \
   --train_dir=${TRAIN_DIR} \
   --dataset_name=cifar10 \
   --dataset_split_name=train \
@@ -55,7 +55,7 @@ python train_image_classifier.py \
   --weight_decay=0.004
 
 # Run evaluation.
-python eval_image_classifier.py \
+python3 ../eval_image_classifier.py \
   --checkpoint_path=${TRAIN_DIR} \
   --eval_dir=${TRAIN_DIR} \
   --dataset_name=cifar10 \

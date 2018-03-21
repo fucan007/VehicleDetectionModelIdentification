@@ -61,7 +61,7 @@ import tensorflow as tf
 from tensorflow.python.platform import gfile
 from datasets import dataset_factory
 from nets import nets_factory
-
+from preprocessing import preprocessing_factory
 
 slim = tf.contrib.slim
 
@@ -106,15 +106,26 @@ def main(_):
   with tf.Graph().as_default() as graph:
     dataset = dataset_factory.get_dataset(FLAGS.dataset_name, 'train',
                                           FLAGS.dataset_dir)
+    preprocessing_name = FLAGS.model_name
+    image_preprocessing_fn = preprocessing_factory.get_preprocessing(
+        preprocessing_name,
+        is_training=False)
+
     network_fn = nets_factory.get_network_fn(
         FLAGS.model_name,
         num_classes=(dataset.num_classes - FLAGS.labels_offset),
         is_training=FLAGS.is_training)
     image_size = FLAGS.image_size or network_fn.default_image_size
-    placeholder = tf.placeholder(name='input', dtype=tf.float32,
-                                 shape=[FLAGS.batch_size, image_size,
-                                        image_size, 3])
-    network_fn(placeholder)
+    # placeholder = tf.placeholder(name='input', dtype=tf.float32,
+    #                              shape=[image_size,
+    #                                     image_size, 3])
+    placeholder = tf.placeholder(name='input',dtype=tf.string)
+    image = tf.image.decode_jpeg(placeholder,channels=3)
+    image = image_preprocessing_fn(image,image_size,image_size)
+    x = tf.expand_dims(image,axis=0)
+    #x =tf.expand_dims(placeholder,axis=0)
+    logits,end_points = network_fn(x)
+    prediction = tf.nn.softmax(logits,name='output')
     graph_def = graph.as_graph_def()
     with gfile.GFile(FLAGS.output_file, 'wb') as f:
       f.write(graph_def.SerializeToString())
