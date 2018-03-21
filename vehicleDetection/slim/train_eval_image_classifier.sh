@@ -1,0 +1,13 @@
+python3 train_eval_image_classifier_local.py \
+--dataset_name=pj_vehicle \
+--dataset_dir=./dataBase \
+--checkpoint_path=./modelRestore/inception_v4.ckpt \
+--model_name=inception_v4 \
+--checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits \
+--train_dir=./output/ckpt \
+--optimizer=rmsprop \
+--dataset_split_name=validation \
+--eval_dir=./output/eval \
+--output_dir=./output \
+--batch_size=32 \
+--learning_rate=0.001
