@@ -175,9 +175,10 @@ def run_inference_on_image(image, model_file=None):
 load image and convert image to numpy array
 '''
 
+
 def draw_imageInfo_into_image(image,imageName,imageInfo,display_image_info):
     try:
-        font = ImageFont.truetype('wqy-microhei.ttc', 8)
+        font = ImageFont.truetype('wqy-microhei.ttc', 15)
     except IOError:
         print ('加载字体失败')
         font = ImageFont.load_default()
@@ -192,7 +193,10 @@ def draw_imageInfo_into_image(image,imageName,imageInfo,display_image_info):
     draw.line([(xmin, ymin), (xmin, ymax),(xmax, ymax),
                (xmax, ymin), (xmin, ymin)], width=5, fill='blue')
 
-    draw.text((xmin, ymin),display_image_info,fill='black',font=font)
+    text_width, text_height = font.getsize(display_image_info)
+    margin = np.ceil(0.05 * text_height)
+    draw.rectangle([(xmin, ymin - text_height - 2 * margin), (xmin + text_width,ymin)],fill='yellow')
+    draw.text((xmin + margin, ymin - text_height - margin),display_image_info,fill='black',font=font)
     plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output1.png'), image)
 
 
@@ -275,7 +279,8 @@ if __name__ == '__main__':
         predictions, top_k, top_names = run_inference_on_image(imageFileName)
         #print ('predictions',predictions)
         id = top_k[0]
-        display_image_info = top_names[0] + ":" + str(predictions[id])
+        score = round(predictions[id],3)
+        display_image_info = top_names[0] + ":" + str(score)
         draw_imageInfo_into_image(image,imageFileNameList[i],imageInfo,display_image_info)
         print ('id:',id)
         print ('display_image_info',display_image_info)
