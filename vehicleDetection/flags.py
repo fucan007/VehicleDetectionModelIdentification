@@ -16,32 +16,26 @@ def parse_args(check=True):
     current_path = os.getcwd()
     parent_path = os.path.abspath('..')#获得当前工作目录的父目录
 
-    parser.add_argument('--path_to_frozen_model', type=str, default=current_path + '/objectDetectionPreTrainingModel',
+    parser.add_argument('--path_to_frozen_model', type=str, default=current_path + '/vehicleDataBase',
                         help='path to save frozen_inference_graph.pb .')
 
     parser.add_argument('--path_to_storage_image', type=str, default=parent_path + '/dataBase/image',
                         help='path to save image.')
 
-    parser.add_argument('--path_to_label_items', type=str, default=current_path + '/objectDetectionPreTrainingModel',
+    parser.add_argument('--path_to_label_items', type=str, default=current_path + '/vehicleDataBase',
                         help='path to save mscoco_label_map.pbtxt.')
 
     parser.add_argument('--path_to_output_image', type=str, default=current_path + '/output',
                         help='path to save the output.')
 
-    parser.add_argument('--dictionary', type=str, default='dictionary.json',
-                        help='path to dictionary.json.')
+    parser.add_argument('--path_to_classification_label', type=str, default=current_path + '/vehicleDataBase/labels.txt',
+                        help='path to classification label.')
 
-    parser.add_argument('--reverse_dictionary', type=str, default='reverse_dictionary.json',
-                        help='path to reverse_dictionary.json.')
+    parser.add_argument('--path_to_classification_model_file', type=str, default=current_path + '/vehicleDataBase/freeze_pj_vehicle.pb',
+                        help='path to classification model file.')
 
-    parser.add_argument('--learning_rate', type=float, default=0.001,
-                        help='learning rate')
+    parser.add_argument('--num_top_predictions',type=int,default=5,help='Display this many predictions.')
 
-    parser.add_argument('--keep_prob', type=float, default=1,
-                        help='keep prop')
-
-    parser.add_argument('--restore_constant_checkout', type=str, default='/data/progressTogether/rnn-data/model.ckpt-353460',
-                        help='keep prop')
 
     FLAGS, unparsed = parser.parse_known_args()
 
