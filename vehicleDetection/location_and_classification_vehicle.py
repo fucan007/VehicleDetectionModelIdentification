@@ -60,7 +60,8 @@ def load_image_into_numpy_array(image):
     return np.array(image.getdata()).reshape(
         (im_height, im_width, 3)).astype(np.uint8)
 
-def find_object_dection_box(boxes,
+def find_object_dection_box(category_index,
+                            boxes,
                             classes,
                             scores):
     min_score_thresh=.4
@@ -199,39 +200,36 @@ def draw_imageInfo_into_image(image,imageName,imageInfo,display_image_info):
     draw.text((xmin + margin, ymin - text_height - margin),display_image_info,fill='black',font=font)
     plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output1.png'), image)
 
-
-
-if __name__ == '__main__':
+def location_and_claaification_vehicle(image_file_path):
     object_car_num = 0
     imageFileNameList = []
     imageInfo = {}
     category_index = loading_label_index()
     loading_model_data()
+    image = Image.open(image_file_path)
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:
-            PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')
-            image = Image.open(PATH_TO_IMAGE)
             (im_width, im_height) = image.size
             image_np = load_image_into_numpy_array(image)
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
             image_np_expanded = np.expand_dims(image_np, axis=0)
             image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-            
+
             # Each box represents a part of the image where a particular object was detected.
             boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-            
+
             # Each score represent how level of confidence for each of the objects.
             # Score is shown on the result image, together with the class label.
             scores = detection_graph.get_tensor_by_name('detection_scores:0')
             classes = detection_graph.get_tensor_by_name('detection_classes:0')
             num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-            
+
             # Actual detection.
             (boxes, scores, classes, num_detections) = sess.run(
                 [boxes, scores, classes, num_detections],
                 feed_dict={image_tensor: image_np_expanded})
-            #print (boxes)
-            #imageCut = image.crop(boxes)
+            # print (boxes)
+            # imageCut = image.crop(boxes)
             # Visualization of the results of a detection.将识别结果标记在图片上
             vis_util.visualize_boxes_and_labels_on_image_array(
                 image_np,
@@ -243,7 +241,8 @@ if __name__ == '__main__':
                 use_normalized_coordinates=True,
                 line_thickness=8)
 
-            box_to_color_map = find_object_dection_box(np.squeeze(boxes),
+            box_to_color_map = find_object_dection_box(category_index,
+                                                       np.squeeze(boxes),
                                                        np.squeeze(classes).astype(np.int32),
                                                        np.squeeze(scores))
             object_num = 0
@@ -252,16 +251,17 @@ if __name__ == '__main__':
 
                 object_num = object_num + 1
                 if className == 'car':
-                    imageFileName =  'car' + str(object_num) + '.png'
+                    imageFileName = 'car' + str(object_num) + '.png'
                     imageFileNameList.append(imageFileName)
                     imageInfo[imageFileName] = box
-                    print ('imageFileName',imageFileName)
-                    boxCut = (int(xmin*im_width),int(ymin*im_height),math.ceil(xmax*im_width),math.ceil(ymax*im_height))
-                    print ('boxCut',boxCut)
+                    print ('imageFileName', imageFileName)
+                    boxCut = (int(xmin * im_width), int(ymin * im_height), math.ceil(xmax * im_width),
+                              math.ceil(ymax * im_height))
+                    print ('boxCut', boxCut)
                     object_car_num = object_car_num + 1
                     imageFile = image.crop(boxCut)
                     plt.imsave(os.path.join(FLAGS.path_to_output_image, imageFileName), imageFile)
-            print ('发现的车辆数目为：',object_car_num)
+            print ('发现的车辆数目为：', object_car_num)
             # output result输出
             # for i in range(3):
             #     if classes[0][i] in category_index.keys():
@@ -271,18 +271,23 @@ if __name__ == '__main__':
             #     print("物体：%s 概率：%s" % (class_name, scores[0][i]))
 
             plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
-    print ('image info:',imageInfo)
-    image = Image.open(PATH_TO_IMAGE)
+    print ('image info:', imageInfo)
     for i in range(len(imageFileNameList)):
         print("序号：%s   值：%s" % (i + 1, imageFileNameList[i]))
         imageFileName = os.path.join(FLAGS.path_to_output_image, imageFileNameList[i])
         predictions, top_k, top_names = run_inference_on_image(imageFileName)
-        #print ('predictions',predictions)
+        # print ('predictions',predictions)
         id = top_k[0]
-        score = round(predictions[id],3)
+        score = round(predictions[id], 3)
         display_image_info = top_names[0] + ":" + str(score)
-        draw_imageInfo_into_image(image,imageFileNameList[i],imageInfo,display_image_info)
-        print ('id:',id)
-        print ('display_image_info',display_image_info)
-        print ('top_k',top_k)
-        print ('top_names',top_names)
+        draw_imageInfo_into_image(image, imageFileNameList[i], imageInfo, display_image_info)
+        print ('id:', id)
+        print ('display_image_info', display_image_info)
+        print ('top_k', top_k)
+        print ('top_names', top_names)
+
+    return object_car_num
+
+if __name__ == '__main__':
+    PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')
+    location_and_claaification_vehicle(PATH_TO_IMAGE)
