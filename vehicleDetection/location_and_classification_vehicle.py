@@ -250,7 +250,7 @@ def location_and_claaification_vehicle(image_file_path):
                 ymin, xmin, ymax, xmax = box
 
                 object_num = object_num + 1
-                if className == 'car':
+                if className == 'car' or className == 'truck' :
                     imageFileName = 'car' + str(object_num) + '.png'
                     imageFileNameList.append(imageFileName)
                     imageInfo[imageFileName] = box
@@ -286,7 +286,7 @@ def location_and_claaification_vehicle(image_file_path):
         print ('top_k', top_k)
         print ('top_names', top_names)
 
-    return object_car_num
+    return object_car_num, os.path.join(FLAGS.path_to_output_image, 'output1.png')
 
 if __name__ == '__main__':
     PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')
