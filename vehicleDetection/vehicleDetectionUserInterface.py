@@ -49,8 +49,8 @@ class MyTable(QTableWidget):
             self.setItem(i, 0, QTableWidgetItem('  ' + vehileName))
             self.setItem(i, 1, QTableWidgetItem(' ' + probability))
             self.setItem(i, 2, QTableWidgetItem(disPosition))
-            self.setItem(i, 3, QTableWidgetItem(W))
-            self.setItem(i, 4, QTableWidgetItem(H))
+            self.setItem(i, 3, QTableWidgetItem(str(W)))
+            self.setItem(i, 4, QTableWidgetItem(str(H)))
 
             i = i + 1
 
