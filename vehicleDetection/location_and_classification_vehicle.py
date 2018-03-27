@@ -177,13 +177,13 @@ load image and convert image to numpy array
 '''
 
 
-def draw_imageInfo_into_image(image,imageName,imageInfo,display_image_info):
+def draw_imageInfo_into_image(image,imageName,id_to_ob,imageInfo,display_image_info):
     try:
         font = ImageFont.truetype('wqy-microhei.ttc', 15)
     except IOError:
         print ('加载字体失败')
         font = ImageFont.load_default()
-    box = imageInfo[imageName]
+    box = imageInfo[id_to_ob]
     ymin, xmin, ymax, xmax = box
     (im_width, im_height) = image.size
     xmin = xmin * im_width
@@ -198,7 +198,46 @@ def draw_imageInfo_into_image(image,imageName,imageInfo,display_image_info):
     margin = np.ceil(0.05 * text_height)
     draw.rectangle([(xmin, ymin - text_height - 2 * margin), (xmin + text_width,ymin)],fill='yellow')
     draw.text((xmin + margin, ymin - text_height - margin),display_image_info,fill='black',font=font)
-    plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output1.png'), image)
+    plt.imsave(imageName, image)
+
+def draw_detailed_into_image(image,imageName,id_to_ob,imageInfo,display_image_info):
+    try:
+        font = ImageFont.truetype('wqy-microhei.ttc', 15)
+    except IOError:
+        print ('加载字体失败')
+        font = ImageFont.load_default()
+    box = imageInfo[id_to_ob]
+    ymin, xmin, ymax, xmax = box
+    (im_width, im_height) = image.size
+    xmin = xmin * im_width
+    ymin = ymin * im_height
+    xmax = xmax * im_width
+    ymax = ymax * im_height
+    draw = ImageDraw.Draw(image)
+    draw.line([(xmin, ymin), (xmin, ymax),(xmax, ymax),
+               (xmax, ymin), (xmin, ymin)], width=5, fill='blue')
+    w_margin = 0.3 * (xmax - xmin)
+    h_margin = 0.3 * (ymax - ymin)
+    font_size = int(0.1 * (w_margin + h_margin))
+    try:
+        myfont = ImageFont.truetype('wqy-microhei.ttc',font_size)
+    except IOError:
+        print ('加载字体失败')
+        myfont = ImageFont.load_default()
+    text_width, text_height = myfont.getsize(display_image_info)
+
+
+    margin = np.ceil(0.05 * text_height)
+    w_corrct_margin = text_width - margin
+    h_corrct_margin = 2 * margin
+
+    font_margin_w = 0.5 * (w_margin - w_corrct_margin)
+    font_margin_h = 0.5 * (h_margin - h_corrct_margin)
+
+    draw.ellipse((xmin + w_margin, ymin + h_margin, xmax - w_margin, ymax - h_margin), 'seagreen', 'skyblue')
+    draw.text((xmin + w_margin + font_margin_w, ymin + h_margin + font_margin_h), display_image_info, fill='red', font=myfont)
+
+    plt.imsave(imageName, image)
 
 def location_and_claaification_vehicle(image_file_path):
     object_car_num = 0
@@ -272,6 +311,8 @@ def location_and_claaification_vehicle(image_file_path):
 
             plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
     print ('image info:', imageInfo)
+    after_classification_image = os.path.join(FLAGS.path_to_output_image, 'output_location_classification.png')
+    after_classification_image_detailed = os.path.join(FLAGS.path_to_output_image, 'output_location_classification_detailed.png')
     for i in range(len(imageFileNameList)):
         print("序号：%s   值：%s" % (i + 1, imageFileNameList[i]))
         imageFileName = os.path.join(FLAGS.path_to_output_image, imageFileNameList[i])
@@ -280,13 +321,15 @@ def location_and_claaification_vehicle(image_file_path):
         id = top_k[0]
         score = round(predictions[id], 3)
         display_image_info = top_names[0] + ":" + str(score)
-        draw_imageInfo_into_image(image, imageFileNameList[i], imageInfo, display_image_info)
+        draw_imageInfo_into_image(image, after_classification_image,imageFileNameList[i], imageInfo, display_image_info)
+        draw_detailed_into_image(image, after_classification_image_detailed,imageFileNameList[i], imageInfo, top_names[0])
+
         print ('id:', id)
         print ('display_image_info', display_image_info)
         print ('top_k', top_k)
         print ('top_names', top_names)
 
-    return object_car_num, os.path.join(FLAGS.path_to_output_image, 'output1.png')
+    return object_car_num, after_classification_image,after_classification_image_detailed
 
 if __name__ == '__main__':
     PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')

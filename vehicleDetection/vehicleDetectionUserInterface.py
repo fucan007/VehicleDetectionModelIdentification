@@ -33,7 +33,12 @@ class PictureWindow(QtWidgets.QWidget):
         self.DisplayPictureButton = QtWidgets.QPushButton(self)
         self.DisplayPictureButton.setObjectName("myButton")
         self.DisplayPictureButton.setText("Display")
-        self.DisplayPictureButton.clicked.connect(self.displayPicture)
+        self.DisplayPictureButton.clicked.connect(self.displayDetailPicture)
+
+        self.DisplayDetailButton = QtWidgets.QPushButton(self)
+        self.DisplayDetailButton.setObjectName("myButton")
+        self.DisplayDetailButton.setText("Detail")
+        self.DisplayDetailButton.clicked.connect(self.displayPicture)
 
         self.stopApplicationButton = QtWidgets.QPushButton(self)
         self.stopApplicationButton.setObjectName("myButton")
@@ -54,6 +59,7 @@ class PictureWindow(QtWidgets.QWidget):
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.InputPictureButton)
         self.hbox.addWidget(self.TrainPictureButton)
+        self.hbox.addWidget(self.DisplayDetailButton)
         self.hbox.addWidget(self.DisplayPictureButton)
         self.hbox.addWidget(self.stopApplicationButton)
 
@@ -111,13 +117,34 @@ class PictureWindow(QtWidgets.QWidget):
             self.displayOutputPictureLabel.setPixmap(outputPixmap)
             print ('here!')
 
+    def displayDetailPicture(self):
+        try:
+            detailPixmap = QtGui.QPixmap(self.outputDetailPictureName)
+            outputPixmap = QtGui.QPixmap(self.outputPictureName)
+        except AttributeError:
+            reply = QMessageBox.information(self,
+                                    "请先选择一张图片",
+                                    "是否现在选择一张图片。",
+                                    QMessageBox.Yes | QMessageBox.No)
+            #self.displayMessage(reply)
+            if reply == QMessageBox.Yes:
+                #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
+                self.selectPicture()
+        else:
+            print ('here!')
+            self.displayInputPictureLabel.setScaledContents(True)
+            self.displayInputPictureLabel.setPixmap(detailPixmap)
+            self.displayOutputPictureLabel.setScaledContents(True)
+            self.displayOutputPictureLabel.setPixmap(outputPixmap)
+            print ('here!')
+
     def displayMessage(self, value):
         '''显示对话框返回值'''
         QMessageBox.information(self, "返回值",   "得到：{}\n\ntype: {}".format(value, type(value)), QMessageBox.Yes | QMessageBox.No)
         #pass
 
     def Train(self):
-        object_car_num,self.outputPictureName= location_and_claaification_vehicle(self.inputPictureName)
+        object_car_num,self.outputPictureName,self.outputDetailPictureName= location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
         print (object_car_num)
 if __name__=="__main__":
