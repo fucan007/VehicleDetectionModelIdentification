@@ -243,6 +243,7 @@ def location_and_claaification_vehicle(image_file_path):
     object_car_num = 0
     imageFileNameList = []
     imageInfo = {}
+    saveTrainResult = {}
     category_index = loading_label_index()
     loading_model_data()
     image = Image.open(image_file_path)
@@ -321,6 +322,7 @@ def location_and_claaification_vehicle(image_file_path):
         id = top_k[0]
         score = round(predictions[id], 3)
         display_image_info = top_names[0] + ":" + str(score)
+        saveTrainResult[display_image_info] = imageInfo[imageFileNameList[i]]
         draw_imageInfo_into_image(image, after_classification_image,imageFileNameList[i], imageInfo, display_image_info)
         draw_detailed_into_image(image, after_classification_image_detailed,imageFileNameList[i], imageInfo, top_names[0])
 
@@ -329,7 +331,7 @@ def location_and_claaification_vehicle(image_file_path):
         print ('top_k', top_k)
         print ('top_names', top_names)
 
-    return object_car_num, after_classification_image,after_classification_image_detailed
+    return object_car_num, after_classification_image,after_classification_image_detailed,saveTrainResult
 
 if __name__ == '__main__':
     PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')

@@ -2,10 +2,44 @@
 # coding = utf-8
 
 from PyQt5 import QtWidgets,QtGui
-from PyQt5.QtWidgets import QFileDialog,QDesktopWidget,QHBoxLayout,QVBoxLayout,QInputDialog,QMessageBox
+from PyQt5.QtWidgets import QFileDialog,QDesktopWidget,QHBoxLayout,QVBoxLayout,QInputDialog,QMessageBox,QTableWidget,QTableWidgetItem
 from PyQt5.QtCore import Qt,QThread,qDebug
 
 from location_and_classification_vehicle import location_and_claaification_vehicle
+
+class MyTable(QTableWidget):
+    def __init__(self,parent=None):
+        super(MyTable, self).__init__(parent)
+        self.setWindowTitle("vehicle")
+        #self.setWindowIcon(QIcon("male.png"))
+        self.resize(500, 200)
+        self.setColumnCount(3)
+        self.setRowCount(5)
+        #设置表格有两行五列。
+        self.setColumnWidth(0, 200)
+        #self.setColumnWidth(4, 200)
+        #self.setRowHeight(0, 100)
+        #设置第一行高度为100px，第一列宽度为200px。
+        self.table()
+        self.center()
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "Position"])
+        self.setVerticalHeaderLabels(["第一辆", "第二辆","第三辆","第四辆","第五辆"])
+
+
+    def table(self):
+        self.setItem(0,0,QTableWidgetItem("           你的名字"))
+        self.setItem(0,1,QTableWidgetItem("性别"))
+        self.setItem(0,2,QTableWidgetItem("出生日期"))
+        self.setItem(0,3, QTableWidgetItem("职业"))
+        self.setItem(0,4, QTableWidgetItem("收入"))
+        #添加表格的文字内容.
+
 
 class PictureWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -13,6 +47,7 @@ class PictureWindow(QtWidgets.QWidget):
         self.initUi()
         self.center()
         self.isTraining = False
+        self.window2 = MyTable()
 
     def initUi(self):
         self._diaheight = 800
@@ -141,6 +176,7 @@ class PictureWindow(QtWidgets.QWidget):
             self.displayInputPictureLabel.setScaledContents(True)
             self.displayInputPictureLabel.setPixmap(detailPixmap)
 
+
     def informationImage(self):
         try:
             self.inputPictureName
@@ -167,10 +203,9 @@ class PictureWindow(QtWidgets.QWidget):
                                         "很遗憾！该图片中没有发现任何汽车",
                                         QMessageBox.Yes)
             else:
-                QMessageBox.information(self,
-                                        "NOTIFICATION",
-                                        "是否现在选择一张图片。",
-                                        QMessageBox.Yes)
+                print (self.imageFileNameList)
+                self.window2.show()
+
     def displayMessage(self, value):
         '''显示对话框返回值'''
         QMessageBox.information(self, "返回值",   "得到：{}\n\ntype: {}".format(value, type(value)), QMessageBox.Yes | QMessageBox.No)
@@ -178,9 +213,10 @@ class PictureWindow(QtWidgets.QWidget):
 
     def Train(self):
         self.isTraining = True
-        self.object_car_num,self.outputPictureName,self.outputDetailPictureName= location_and_claaification_vehicle(self.inputPictureName)
+        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageFileNameList = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
         print (self.object_car_num)
+
 if __name__=="__main__":
     import sys
     app=QtWidgets.QApplication(sys.argv)
