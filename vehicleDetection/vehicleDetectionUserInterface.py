@@ -131,12 +131,8 @@ class PictureWindow(QtWidgets.QWidget):
                 #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
                 self.selectPicture()
         else:
-            print ('here!')
             self.displayInputPictureLabel.setScaledContents(True)
             self.displayInputPictureLabel.setPixmap(detailPixmap)
-            self.displayOutputPictureLabel.setScaledContents(True)
-            self.displayOutputPictureLabel.setPixmap(outputPixmap)
-            print ('here!')
 
     def displayMessage(self, value):
         '''显示对话框返回值'''
