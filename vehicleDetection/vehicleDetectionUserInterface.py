@@ -13,7 +13,7 @@ class MyTable(QTableWidget):
         self.setWindowTitle("vehicle")
         #self.setWindowIcon(QIcon("male.png"))
         self.resize(500, 200)
-        self.setColumnCount(3)
+        self.setColumnCount(5)
         self.setRowCount(5)
         #设置表格有两行五列。
         self.setColumnWidth(0, 200)
@@ -28,7 +28,7 @@ class MyTable(QTableWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-        self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "Position"])
+        self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "Position","image_width","image_height"])
         self.setVerticalHeaderLabels(["第一辆", "第二辆","第三辆","第四辆","第五辆"])
 
 
@@ -49,6 +49,9 @@ class MyTable(QTableWidget):
             self.setItem(i, 0, QTableWidgetItem('  ' + vehileName))
             self.setItem(i, 1, QTableWidgetItem(' ' + probability))
             self.setItem(i, 2, QTableWidgetItem(disPosition))
+            self.setItem(i, 3, QTableWidgetItem(W))
+            self.setItem(i, 4, QTableWidgetItem(H))
+
             i = i + 1
 
 class PictureWindow(QtWidgets.QWidget):
