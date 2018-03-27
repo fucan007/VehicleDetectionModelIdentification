@@ -17,6 +17,7 @@ class MyTable(QTableWidget):
         self.setRowCount(5)
         #设置表格有两行五列。
         self.setColumnWidth(0, 200)
+        self.setColumnWidth(2, 200)
         #self.setColumnWidth(4, 200)
         #self.setRowHeight(0, 100)
         #设置第一行高度为100px，第一列宽度为200px。
@@ -40,6 +41,18 @@ class MyTable(QTableWidget):
         self.setItem(0,4, QTableWidgetItem("收入"))
         #添加表格的文字内容.
 
+    def updateTableInfo(self,num,imageInfoDictionary):
+        i = 0
+        for vehileInfo in imageInfoDictionary.keys():
+            print ('vehileInfo',vehileInfo)
+            vehileName,probability = vehileInfo.split(':')
+            Position = imageInfoDictionary[vehileInfo]
+            ymin, xmin, ymax, xmax = Position
+            disPosition = '(' + str(round(xmin,2)) + ',' + str(round(ymin,2)) + ')' + '  ' + '(' + str(round(xmax,2)) + ',' + str(round(ymax,2)) + ')'
+            self.setItem(i, 0, QTableWidgetItem('  ' + vehileName))
+            self.setItem(i, 1, QTableWidgetItem(' ' + probability))
+            self.setItem(i, 2, QTableWidgetItem(disPosition))
+            i = i + 1
 
 class PictureWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -203,7 +216,8 @@ class PictureWindow(QtWidgets.QWidget):
                                         "很遗憾！该图片中没有发现任何汽车",
                                         QMessageBox.Yes)
             else:
-                print (self.imageFileNameList)
+                print (self.imageInfoDictionary)
+                self.window2.updateTableInfo(self.object_car_num,self.imageInfoDictionary)
                 self.window2.show()
 
     def displayMessage(self, value):
@@ -213,7 +227,7 @@ class PictureWindow(QtWidgets.QWidget):
 
     def Train(self):
         self.isTraining = True
-        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageFileNameList = location_and_claaification_vehicle(self.inputPictureName)
+        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageInfoDictionary = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
         print (self.object_car_num)
 
