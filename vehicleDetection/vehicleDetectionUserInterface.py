@@ -12,6 +12,7 @@ class PictureWindow(QtWidgets.QWidget):
         super(PictureWindow,self).__init__()
         self.initUi()
         self.center()
+        self.isTraining = False
 
     def initUi(self):
         self._diaheight = 800
@@ -32,13 +33,18 @@ class PictureWindow(QtWidgets.QWidget):
 
         self.DisplayPictureButton = QtWidgets.QPushButton(self)
         self.DisplayPictureButton.setObjectName("myButton")
-        self.DisplayPictureButton.setText("Display")
+        self.DisplayPictureButton.setText("Detail")
         self.DisplayPictureButton.clicked.connect(self.displayDetailPicture)
 
         self.DisplayDetailButton = QtWidgets.QPushButton(self)
         self.DisplayDetailButton.setObjectName("myButton")
-        self.DisplayDetailButton.setText("Detail")
+        self.DisplayDetailButton.setText("display")
         self.DisplayDetailButton.clicked.connect(self.displayPicture)
+
+        self.informationImageButton = QtWidgets.QPushButton(self)
+        self.informationImageButton.setObjectName("myButton")
+        self.informationImageButton.setText("info")
+        self.informationImageButton.clicked.connect(self.informationImage)
 
         self.stopApplicationButton = QtWidgets.QPushButton(self)
         self.stopApplicationButton.setObjectName("myButton")
@@ -61,6 +67,7 @@ class PictureWindow(QtWidgets.QWidget):
         self.hbox.addWidget(self.TrainPictureButton)
         self.hbox.addWidget(self.DisplayDetailButton)
         self.hbox.addWidget(self.DisplayPictureButton)
+        self.hbox.addWidget(self.informationImageButton)
         self.hbox.addWidget(self.stopApplicationButton)
 
         self.vbox = QVBoxLayout()
@@ -134,15 +141,46 @@ class PictureWindow(QtWidgets.QWidget):
             self.displayInputPictureLabel.setScaledContents(True)
             self.displayInputPictureLabel.setPixmap(detailPixmap)
 
+    def informationImage(self):
+        try:
+            self.inputPictureName
+        except AttributeError:
+            reply = QMessageBox.information(self,
+                                    "NOTIFICATION",
+                                    "请先选择一张图片,进行训练,是否现在选择一张图片。",
+                                    QMessageBox.Yes | QMessageBox.No)
+            #self.displayMessage(reply)
+            print (QMessageBox.Yes)
+            qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
+            if reply == QMessageBox.Yes:
+                #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
+                self.selectPicture()
+        else:
+            if self.isTraining == False:
+                QMessageBox.information(self,
+                                        "NOTIFICATION",
+                                        "请先进行Traing",
+                                        QMessageBox.Yes)
+            elif self.object_car_num == 0:
+                QMessageBox.information(self,
+                                        "NOTIFICATION",
+                                        "很遗憾！该图片中没有发现任何汽车",
+                                        QMessageBox.Yes)
+            else:
+                QMessageBox.information(self,
+                                        "NOTIFICATION",
+                                        "是否现在选择一张图片。",
+                                        QMessageBox.Yes)
     def displayMessage(self, value):
         '''显示对话框返回值'''
         QMessageBox.information(self, "返回值",   "得到：{}\n\ntype: {}".format(value, type(value)), QMessageBox.Yes | QMessageBox.No)
         #pass
 
     def Train(self):
-        object_car_num,self.outputPictureName,self.outputDetailPictureName= location_and_claaification_vehicle(self.inputPictureName)
+        self.isTraining = True
+        self.object_car_num,self.outputPictureName,self.outputDetailPictureName= location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
-        print (object_car_num)
+        print (self.object_car_num)
 if __name__=="__main__":
     import sys
     app=QtWidgets.QApplication(sys.argv)
