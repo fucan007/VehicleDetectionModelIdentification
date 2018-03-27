@@ -314,6 +314,7 @@ def location_and_claaification_vehicle(image_file_path):
     print ('image info:', imageInfo)
     after_classification_image = os.path.join(FLAGS.path_to_output_image, 'output_location_classification.png')
     after_classification_image_detailed = os.path.join(FLAGS.path_to_output_image, 'output_location_classification_detailed.png')
+    image_copy = image.copy()
     for i in range(len(imageFileNameList)):
         print("序号：%s   值：%s" % (i + 1, imageFileNameList[i]))
         imageFileName = os.path.join(FLAGS.path_to_output_image, imageFileNameList[i])
@@ -324,14 +325,14 @@ def location_and_claaification_vehicle(image_file_path):
         display_image_info = top_names[0] + ":" + str(score)
         saveTrainResult[display_image_info] = imageInfo[imageFileNameList[i]]
         draw_imageInfo_into_image(image, after_classification_image,imageFileNameList[i], imageInfo, display_image_info)
-        draw_detailed_into_image(image, after_classification_image_detailed,imageFileNameList[i], imageInfo, top_names[0])
+        draw_detailed_into_image(image_copy, after_classification_image_detailed,imageFileNameList[i], imageInfo, top_names[0])
 
         print ('id:', id)
         print ('display_image_info', display_image_info)
         print ('top_k', top_k)
         print ('top_names', top_names)
 
-    return object_car_num, after_classification_image,after_classification_image_detailed,saveTrainResult
+    return object_car_num, after_classification_image,after_classification_image_detailed,saveTrainResult,image.size
 
 if __name__ == '__main__':
     PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')

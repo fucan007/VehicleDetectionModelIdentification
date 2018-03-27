@@ -21,7 +21,6 @@ class MyTable(QTableWidget):
         #self.setColumnWidth(4, 200)
         #self.setRowHeight(0, 100)
         #设置第一行高度为100px，第一列宽度为200px。
-        self.table()
         self.center()
 
     def center(self):
@@ -33,21 +32,19 @@ class MyTable(QTableWidget):
         self.setVerticalHeaderLabels(["第一辆", "第二辆","第三辆","第四辆","第五辆"])
 
 
-    def table(self):
-        self.setItem(0,0,QTableWidgetItem("           你的名字"))
-        self.setItem(0,1,QTableWidgetItem("性别"))
-        self.setItem(0,2,QTableWidgetItem("出生日期"))
-        self.setItem(0,3, QTableWidgetItem("职业"))
-        self.setItem(0,4, QTableWidgetItem("收入"))
-        #添加表格的文字内容.
 
-    def updateTableInfo(self,num,imageInfoDictionary):
+    def updateTableInfo(self,num,imageInfoDictionary,W,H):
         i = 0
         for vehileInfo in imageInfoDictionary.keys():
             print ('vehileInfo',vehileInfo)
             vehileName,probability = vehileInfo.split(':')
             Position = imageInfoDictionary[vehileInfo]
             ymin, xmin, ymax, xmax = Position
+            xmin = xmin * W
+            xmax = xmax * W
+            ymin = ymin * H
+            ymax = ymax * H
+
             disPosition = '(' + str(round(xmin,2)) + ',' + str(round(ymin,2)) + ')' + '  ' + '(' + str(round(xmax,2)) + ',' + str(round(ymax,2)) + ')'
             self.setItem(i, 0, QTableWidgetItem('  ' + vehileName))
             self.setItem(i, 1, QTableWidgetItem(' ' + probability))
@@ -217,7 +214,7 @@ class PictureWindow(QtWidgets.QWidget):
                                         QMessageBox.Yes)
             else:
                 print (self.imageInfoDictionary)
-                self.window2.updateTableInfo(self.object_car_num,self.imageInfoDictionary)
+                self.window2.updateTableInfo(self.object_car_num,self.imageInfoDictionary,self.im_width, self.im_height)
                 self.window2.show()
 
     def displayMessage(self, value):
@@ -227,7 +224,7 @@ class PictureWindow(QtWidgets.QWidget):
 
     def Train(self):
         self.isTraining = True
-        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageInfoDictionary = location_and_claaification_vehicle(self.inputPictureName)
+        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageInfoDictionary,(self.im_width, self.im_height) = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
         print (self.object_car_num)
 
