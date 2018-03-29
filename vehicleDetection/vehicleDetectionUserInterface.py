@@ -28,8 +28,8 @@ class MyTable(QTableWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-        self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "Position","image_width","image_height"])
-        self.setVerticalHeaderLabels(["第一辆", "第二辆","第三辆","第四辆","第五辆"])
+        self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "position","image_width","image_height"])
+        self.setVerticalHeaderLabels(["First vehicle", "Second vehicles","Third vehicles"," Fourth vehicles "," Fifth vehicles "])
 
 
 
@@ -71,13 +71,13 @@ class PictureWindow(QtWidgets.QWidget):
 
         self.InputPictureButton = QtWidgets.QPushButton(self)
         self.InputPictureButton.setObjectName("myButton")
-        self.InputPictureButton.setText("选取一张图片")
+        self.InputPictureButton.setText("Selct picture")
         self.InputPictureButton.clicked.connect(self.selectPicture)
 
         self.TrainPictureButton = QtWidgets.QPushButton(self)
         self.TrainPictureButton.setObjectName("myButton")
-        self.TrainPictureButton.setText("Training")
-        self.TrainPictureButton.clicked.connect(self.Train)
+        self.TrainPictureButton.setText("Inference")
+        self.TrainPictureButton.clicked.connect(self.InferencePicture)
 
         self.DisplayPictureButton = QtWidgets.QPushButton(self)
         self.DisplayPictureButton.setObjectName("myButton")
@@ -91,7 +91,7 @@ class PictureWindow(QtWidgets.QWidget):
 
         self.informationImageButton = QtWidgets.QPushButton(self)
         self.informationImageButton.setObjectName("myButton")
-        self.informationImageButton.setText("info")
+        self.informationImageButton.setText("Info")
         self.informationImageButton.clicked.connect(self.informationImage)
 
         self.stopApplicationButton = QtWidgets.QPushButton(self)
@@ -225,7 +225,7 @@ class PictureWindow(QtWidgets.QWidget):
         QMessageBox.information(self, "返回值",   "得到：{}\n\ntype: {}".format(value, type(value)), QMessageBox.Yes | QMessageBox.No)
         #pass
 
-    def Train(self):
+    def InferencePicture(self):
         self.isTraining = True
         self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageInfoDictionary,(self.im_width, self.im_height) = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
