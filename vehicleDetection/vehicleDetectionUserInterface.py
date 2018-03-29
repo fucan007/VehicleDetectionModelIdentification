@@ -34,6 +34,7 @@ class MyTable(QTableWidget):
 
 
     def updateTableInfo(self,num,imageInfoDictionary,W,H):
+        self.deleteOldItem()
         i = 0
         for vehileInfo in imageInfoDictionary.keys():
             print ('vehileInfo',vehileInfo)
@@ -53,6 +54,12 @@ class MyTable(QTableWidget):
             self.setItem(i, 4, QTableWidgetItem(str(H)))
 
             i = i + 1
+
+    def deleteOldItem(self):
+        for i in range(5):
+            for j in range(5):
+                self.setItem(i,j, QTableWidgetItem(None))
+
 
 class PictureWindow(QtWidgets.QWidget):
     def __init__(self):
