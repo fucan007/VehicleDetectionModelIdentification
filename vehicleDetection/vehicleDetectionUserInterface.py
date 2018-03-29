@@ -7,46 +7,52 @@ from PyQt5.QtCore import Qt,QThread,qDebug
 
 from location_and_classification_vehicle import location_and_claaification_vehicle
 
+#创建一个QTableWidget主要用于当检测到汽车，建立一个表格用来存放汽车相关的信息
 class MyTable(QTableWidget):
     def __init__(self,parent=None):
         super(MyTable, self).__init__(parent)
+        #给表格设置titel
         self.setWindowTitle("vehicle")
-        #self.setWindowIcon(QIcon("male.png"))
+        #给表格设置大小
         self.resize(500, 200)
+        #设置列数和行数
         self.setColumnCount(5)
         self.setRowCount(5)
-        #设置表格有两行五列。
+        #将第一列和第三列设置为200px
         self.setColumnWidth(0, 200)
         self.setColumnWidth(2, 200)
-        #self.setColumnWidth(4, 200)
-        #self.setRowHeight(0, 100)
-        #设置第一行高度为100px，第一列宽度为200px。
         self.center()
 
     def center(self):
         qr = self.frameGeometry()
+        #居中显示
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+        #给行和列设置名称
         self.setHorizontalHeaderLabels( ["vehicle_name", "probability", "position","image_width","image_height"])
         self.setVerticalHeaderLabels(["First vehicle", "Second vehicles","Third vehicles"," Fourth vehicles "," Fifth vehicles "])
 
 
-
+        #将图片相关的信息添加到表哥里
     def updateTableInfo(self,num,imageInfoDictionary,W,H):
+        #将之前的表格内容清空
         self.deleteOldItem()
         i = 0
         for vehileInfo in imageInfoDictionary.keys():
             print ('vehileInfo',vehileInfo)
+            #调用分割符将名称和概率分开
             vehileName,probability = vehileInfo.split(':')
             Position = imageInfoDictionary[vehileInfo]
+            #获取对应的位置信息
             ymin, xmin, ymax, xmax = Position
             xmin = xmin * W
             xmax = xmax * W
             ymin = ymin * H
             ymax = ymax * H
-
+            #设置格式使表格内容更为好看
             disPosition = '(' + str(round(xmin,2)) + ',' + str(round(ymin,2)) + ')' + '  ' + '(' + str(round(xmax,2)) + ',' + str(round(ymax,2)) + ')'
+            #将信息填充到表格里
             self.setItem(i, 0, QTableWidgetItem('  ' + vehileName))
             self.setItem(i, 1, QTableWidgetItem(' ' + probability))
             self.setItem(i, 2, QTableWidgetItem(disPosition))
@@ -64,8 +70,11 @@ class MyTable(QTableWidget):
 class PictureWindow(QtWidgets.QWidget):
     def __init__(self):
         super(PictureWindow,self).__init__()
+        #初始化界面
         self.initUi()
+        #居中显示
         self.center()
+        #设置flag
         self.isTraining = False
         self.window2 = MyTable()
 
@@ -75,7 +84,7 @@ class PictureWindow(QtWidgets.QWidget):
         self.setMinimumHeight(self._diaheight) #设置窗口最小的大小
         self.setMinimumWidth(self._diawidth)
         self.setWindowTitle('vehicle detection and classification system')
-
+        #以下都是按钮的初始化，以及和对应的函数进行链接
         self.InputPictureButton = QtWidgets.QPushButton(self)
         self.InputPictureButton.setObjectName("myButton")
         self.InputPictureButton.setText("Selct picture")
@@ -111,14 +120,11 @@ class PictureWindow(QtWidgets.QWidget):
 
         self.displayOutputPictureLabel = QtWidgets.QLabel(self)
         self.displayOutputPictureLabel.setAlignment(Qt.AlignCenter)
-        #png=QtGui.QPixmap('/home/xiaohui/AI/pyqt_GUI/K-Means_06.png')
-        # 在l1里面，调用setPixmap命令，建立一个图像存放框，并将之前的图像png存放在这个框框里。
-        #self.displayInputPictureLabel.setPixmap(png)
-        #self.displayInputPictureLabel.move(10,20)
 
-        self.hbox = QHBoxLayout()
-        self.hbox.addStretch(1)
-        self.hbox.addWidget(self.InputPictureButton)
+        #对界面进行布局
+        self.hbox = QHBoxLayout()#创建水平布局器
+        self.hbox.addStretch(1)#增加伸缩量
+        self.hbox.addWidget(self.InputPictureButton)#添加按钮
         self.hbox.addWidget(self.TrainPictureButton)
         self.hbox.addWidget(self.DisplayDetailButton)
         self.hbox.addWidget(self.DisplayPictureButton)
@@ -154,9 +160,9 @@ class PictureWindow(QtWidgets.QWidget):
         self.move(qr.topLeft())
 
     def displayPicture(self):
-        print ('Enter function displayPicture',self.inputPictureName)
-        print ('result',self.outputPictureName)
+        print ('Enter function displayPicture and will display ',self.inputPictureName)
         try:
+            # 读取文件转换成pixmap
             inputPixmap = QtGui.QPixmap(self.inputPictureName)
             outputPixmap = QtGui.QPixmap(self.outputPictureName)
         except AttributeError:
@@ -170,19 +176,16 @@ class PictureWindow(QtWidgets.QWidget):
             if reply == QMessageBox.Yes:
                 #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
                 self.selectPicture()
-                print ('here!')
         else:
-            print ('here!')
             self.displayInputPictureLabel.setScaledContents(True)
             self.displayInputPictureLabel.setPixmap(inputPixmap)
             self.displayOutputPictureLabel.setScaledContents(True)
             self.displayOutputPictureLabel.setPixmap(outputPixmap)
-            print ('here!')
 
     def displayDetailPicture(self):
         try:
+            # 读取文件转换成pixmap
             detailPixmap = QtGui.QPixmap(self.outputDetailPictureName)
-            outputPixmap = QtGui.QPixmap(self.outputPictureName)
         except AttributeError:
             reply = QMessageBox.information(self,
                                     "请先选择一张图片",
@@ -193,8 +196,8 @@ class PictureWindow(QtWidgets.QWidget):
                 #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
                 self.selectPicture()
         else:
-            self.displayInputPictureLabel.setScaledContents(True)
-            self.displayInputPictureLabel.setPixmap(detailPixmap)
+            self.displayInputPictureLabel.setScaledContents(True)#设置图片自适应
+            self.displayInputPictureLabel.setPixmap(detailPixmap)#显示图片
 
 
     def informationImage(self):
@@ -205,11 +208,9 @@ class PictureWindow(QtWidgets.QWidget):
                                     "NOTIFICATION",
                                     "请先选择一张图片,进行训练,是否现在选择一张图片。",
                                     QMessageBox.Yes | QMessageBox.No)
-            #self.displayMessage(reply)
             print (QMessageBox.Yes)
             qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
             if reply == QMessageBox.Yes:
-                #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
                 self.selectPicture()
         else:
             if self.isTraining == False:
@@ -234,9 +235,13 @@ class PictureWindow(QtWidgets.QWidget):
 
     def InferencePicture(self):
         self.isTraining = True
-        self.object_car_num,self.outputPictureName,self.outputDetailPictureName,self.imageInfoDictionary,(self.im_width, self.im_height) = location_and_claaification_vehicle(self.inputPictureName)
+        #第二行将图像的路径和名称传入到底层然后取得图像内汽车的数目、将原图处理后的图像的路径和名称等等信息
+        self.object_car_num,\
+        self.outputPictureName,\
+        self.outputDetailPictureName,\
+        self.imageInfoDictionary,\
+        (self.im_width, self.im_height) = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
-        print (self.object_car_num)
 
 if __name__=="__main__":
     import sys
