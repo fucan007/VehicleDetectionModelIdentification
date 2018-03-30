@@ -239,14 +239,10 @@ def draw_detailed_into_image(image,imageName,id_to_ob,imageInfo,display_image_in
 
     plt.imsave(imageName, image)
 
-def location_and_claaification_vehicle(image_file_path):
+def run_location_on_image(image,category_index):
     object_car_num = 0
-    imageFileNameList = []
     imageInfo = {}
-    saveTrainResult = {}
-    category_index = loading_label_index()
-    loading_model_data()
-    image = Image.open(image_file_path)
+    imageFileNameList = []
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:
             (im_width, im_height) = image.size
@@ -311,6 +307,19 @@ def location_and_claaification_vehicle(image_file_path):
             #     print("物体：%s 概率：%s" % (class_name, scores[0][i]))
 
             plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
+
+    return  object_car_num,imageInfo,imageFileNameList
+
+
+def location_and_claaification_vehicle(image_file_path):
+
+    saveTrainResult = {}
+    category_index = loading_label_index()
+    loading_model_data()
+    image = Image.open(image_file_path)
+
+    object_car_num,imageInfo,imageFileNameList = run_location_on_image(image,category_index)
+
     print ('image info:', imageInfo)
     after_classification_image = os.path.join(FLAGS.path_to_output_image, 'output_location_classification.png')
     after_classification_image_detailed = os.path.join(FLAGS.path_to_output_image, 'output_location_classification_detailed.png')
