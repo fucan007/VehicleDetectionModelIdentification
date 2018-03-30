@@ -264,18 +264,22 @@ def run_location_on_image(image,category_index):
             (boxes, scores, classes, num_detections) = sess.run(
                 [boxes, scores, classes, num_detections],
                 feed_dict={image_tensor: image_np_expanded})
-            # print (boxes)
-            # imageCut = image.crop(boxes)
+
+            '''
+            info1：
+            通过sess.run()我们获得了boxes, scores, classes, num_detections这些信息，那么调用下面这个函数则可以将这些信息全部画到
+            图片上，但是这里我们仅需要和vehicle相关的信息，所以在此将起注释掉
+            '''
             # Visualization of the results of a detection.将识别结果标记在图片上
-            vis_util.visualize_boxes_and_labels_on_image_array(
-                image_np,
-                np.squeeze(boxes),
-                np.squeeze(classes).astype(np.int32),
-                np.squeeze(scores),
-                category_index,
-                min_score_thresh=.4,
-                use_normalized_coordinates=True,
-                line_thickness=8)
+            # vis_util.visualize_boxes_and_labels_on_image_array(
+            #     image_np,
+            #     np.squeeze(boxes),
+            #     np.squeeze(classes).astype(np.int32),
+            #     np.squeeze(scores),
+            #     category_index,
+            #     min_score_thresh=.4,
+            #     use_normalized_coordinates=True,
+            #     line_thickness=8)
 
             box_to_color_map = find_object_dection_box(category_index,
                                                        np.squeeze(boxes),
@@ -298,6 +302,10 @@ def run_location_on_image(image,category_index):
                     imageFile = image.crop(boxCut)
                     plt.imsave(os.path.join(FLAGS.path_to_output_image, imageFileName), imageFile)
             print ('发现的车辆数目为：', object_car_num)
+            '''
+            同info1
+            如果需要图片内部全部信息则将一下注释打开
+            '''
             # output result输出
             # for i in range(3):
             #     if classes[0][i] in category_index.keys():
@@ -306,8 +314,7 @@ def run_location_on_image(image,category_index):
             #         class_name = 'N/A'
             #     print("物体：%s 概率：%s" % (class_name, scores[0][i]))
 
-            plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
-
+            #plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
     return  object_car_num,imageInfo,imageFileNameList
 
 
