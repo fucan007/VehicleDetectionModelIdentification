@@ -5,6 +5,8 @@ from PyQt5 import QtWidgets,QtGui
 from PyQt5.QtWidgets import QFileDialog,QDesktopWidget,QHBoxLayout,QVBoxLayout,QInputDialog,QMessageBox,QTableWidget,QTableWidgetItem
 from PyQt5.QtCore import Qt,QThread,qDebug
 
+import line_profiler    #性能分析工具如果这里报错需要安装sudo pip3 install line_profiler，或者将line_profiler相关的代码删除，删除之后不影响app的使用
+
 from location_and_classification_vehicle import location_and_claaification_vehicle
 
 #创建一个QTableWidget主要用于当检测到汽车，建立一个表格用来存放汽车相关的信息
@@ -236,13 +238,16 @@ class PictureWindow(QtWidgets.QWidget):
     def InferencePicture(self):
         self.isTraining = True
         #第二行将图像的路径和名称传入到底层然后取得图像内汽车的数目、将原图处理后的图像的路径和名称等等信息
+        prof = line_profiler.LineProfiler(location_and_claaification_vehicle)
+        prof.enable()  # 开始性能分析
         self.object_car_num,\
         self.outputPictureName,\
         self.outputDetailPictureName,\
         self.imageInfoDictionary,\
         (self.im_width, self.im_height) = location_and_claaification_vehicle(self.inputPictureName)
         print ('Traing end!')
-
+        prof.disable()  # 停止性能分析
+        prof.print_stats(sys.stdout)
 if __name__=="__main__":
     import sys
     app=QtWidgets.QApplication(sys.argv)
