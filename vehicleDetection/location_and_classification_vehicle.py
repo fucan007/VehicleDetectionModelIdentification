@@ -177,7 +177,7 @@ load image and convert image to numpy array
 '''
 
 
-def draw_imageInfo_into_image(image,imageName,id_to_ob,imageInfo,display_image_info):
+def draw_rectangle_for_vehicle_detection(image,imageName,id_to_ob,imageInfo,display_image_info):
     try:
         font = ImageFont.truetype('wqy-microhei.ttc', 15)
     except IOError:
@@ -200,7 +200,7 @@ def draw_imageInfo_into_image(image,imageName,id_to_ob,imageInfo,display_image_i
     draw.text((xmin + margin, ymin - text_height - margin),display_image_info,fill='black',font=font)
     plt.imsave(imageName, image)
 
-def draw_detailed_into_image(image,imageName,id_to_ob,imageInfo,display_image_info):
+def draw_eclipse_for_vehicle_classification(image,imageName,id_to_ob,imageInfo,display_image_info):
     try:
         font = ImageFont.truetype('wqy-microhei.ttc', 15)
     except IOError:
@@ -241,7 +241,7 @@ def draw_detailed_into_image(image,imageName,id_to_ob,imageInfo,display_image_in
 
 def run_location_on_image(image,category_index):
     object_car_num = 0
-    imageInfo = {}
+    imageInfo_to_box = {}
     imageFileNameList = []
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:
@@ -288,12 +288,12 @@ def run_location_on_image(image,category_index):
             object_num = 0
             for box, className in box_to_color_map.items():
                 ymin, xmin, ymax, xmax = box
-
                 object_num = object_num + 1
+
                 if className == 'car' or className == 'truck' :
                     imageFileName = 'car' + str(object_num) + '.png'
                     imageFileNameList.append(imageFileName)
-                    imageInfo[imageFileName] = box
+                    imageInfo_to_box[imageFileName] = box
                     print ('imageFileName', imageFileName)
                     boxCut = (int(xmin * im_width), int(ymin * im_height), math.ceil(xmax * im_width),
                               math.ceil(ymax * im_height))
@@ -315,7 +315,7 @@ def run_location_on_image(image,category_index):
             #     print("物体：%s 概率：%s" % (class_name, scores[0][i]))
 
             #plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
-    return  object_car_num,imageInfo,imageFileNameList
+    return  object_car_num,imageInfo_to_box,imageFileNameList
 
 
 def location_and_claaification_vehicle(image_file_path):
@@ -325,11 +325,10 @@ def location_and_claaification_vehicle(image_file_path):
     loading_model_data()
     image = Image.open(image_file_path)
 
-    object_car_num,imageInfo,imageFileNameList = run_location_on_image(image,category_index)
+    object_car_num,imageInfo_to_box,imageFileNameList = run_location_on_image(image,category_index)
 
-    print ('image info:', imageInfo)
-    after_classification_image = os.path.join(FLAGS.path_to_output_image, 'output_location_classification.png')
-    after_classification_image_detailed = os.path.join(FLAGS.path_to_output_image, 'output_location_classification_detailed.png')
+    after_draw_rectangle_for_vehicle_detection = os.path.join(FLAGS.path_to_output_image, 'vehicle_detection.png')
+    after_draw_eclipse_and_vehicleModel = os.path.join(FLAGS.path_to_output_image, 'vehicle_Model.png')
     image_copy = image.copy()
     for i in range(len(imageFileNameList)):
         print("序号：%s   值：%s" % (i + 1, imageFileNameList[i]))
@@ -339,16 +338,16 @@ def location_and_claaification_vehicle(image_file_path):
         id = top_k[0]
         score = round(predictions[id], 3)
         display_image_info = top_names[0] + ":" + str(score)
-        saveTrainResult[display_image_info] = imageInfo[imageFileNameList[i]]
-        draw_imageInfo_into_image(image, after_classification_image,imageFileNameList[i], imageInfo, display_image_info)
-        draw_detailed_into_image(image_copy, after_classification_image_detailed,imageFileNameList[i], imageInfo, top_names[0])
+        saveTrainResult[display_image_info] = imageInfo_to_box[imageFileNameList[i]]
+        draw_rectangle_for_vehicle_detection(image, after_draw_rectangle_for_vehicle_detection,imageFileNameList[i], imageInfo_to_box, display_image_info)
+        draw_eclipse_for_vehicle_classification(image_copy, after_draw_eclipse_and_vehicleModel,imageFileNameList[i], imageInfo_to_box, top_names[0])
 
         print ('id:', id)
         print ('display_image_info', display_image_info)
         print ('top_k', top_k)
         print ('top_names', top_names)
 
-    return object_car_num, after_classification_image,after_classification_image_detailed,saveTrainResult,image.size
+    return object_car_num, after_draw_rectangle_for_vehicle_detection,after_draw_eclipse_and_vehicleModel,saveTrainResult,image.size
 
 if __name__ == '__main__':
     PATH_TO_IMAGE = os.path.join(FLAGS.path_to_storage_image, 'test.jpg')
