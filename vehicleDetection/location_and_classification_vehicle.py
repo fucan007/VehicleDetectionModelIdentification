@@ -176,7 +176,7 @@ def run_inference_on_image(image, model_file=None):
 load image and convert image to numpy array
 '''
 
-
+#将汽车的位置标出，以及在起左上方显示车的类型
 def draw_rectangle_for_vehicle_detection(image,imageName,id_to_ob,imageInfo,display_image_info):
     try:
         font = ImageFont.truetype('wqy-microhei.ttc', 15)
@@ -200,12 +200,8 @@ def draw_rectangle_for_vehicle_detection(image,imageName,id_to_ob,imageInfo,disp
     draw.text((xmin + margin, ymin - text_height - margin),display_image_info,fill='black',font=font)
     plt.imsave(imageName, image)
 
+#显示车的类型
 def draw_eclipse_for_vehicle_classification(image,imageName,id_to_ob,imageInfo,display_image_info):
-    try:
-        font = ImageFont.truetype('wqy-microhei.ttc', 15)
-    except IOError:
-        print ('加载字体失败')
-        font = ImageFont.load_default()
     box = imageInfo[id_to_ob]
     ymin, xmin, ymax, xmax = box
     (im_width, im_height) = image.size
@@ -219,6 +215,7 @@ def draw_eclipse_for_vehicle_classification(image,imageName,id_to_ob,imageInfo,d
     w_margin = 0.3 * (xmax - xmin)
     h_margin = 0.3 * (ymax - ymin)
     font_size = int(0.1 * (w_margin + h_margin))
+    #这里为了可以实现中文，所以需要引进字体
     try:
         myfont = ImageFont.truetype('wqy-microhei.ttc',font_size)
     except IOError:
@@ -239,9 +236,10 @@ def draw_eclipse_for_vehicle_classification(image,imageName,id_to_ob,imageInfo,d
 
     plt.imsave(imageName, image)
 
+#预测图片中物体，并将和车相关的信息提取
 def run_location_on_image(image,category_index,detection_graph):
     object_car_num = 0
-    imageInfo_to_box = {}
+    imageInfo_to_box = {}#字典将每个clip图片的name和box建立关系
     imageFileNameList = []
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:
@@ -280,7 +278,7 @@ def run_location_on_image(image,category_index,detection_graph):
                 min_score_thresh=.4,
                 use_normalized_coordinates=True,
                 line_thickness=8)
-
+            #获取物体的框子
             box_to_color_map = find_object_dection_box(category_index,
                                                        np.squeeze(boxes),
                                                        np.squeeze(classes).astype(np.int32),
@@ -317,6 +315,7 @@ def run_location_on_image(image,category_index,detection_graph):
             plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
     return  object_car_num,imageInfo_to_box,imageFileNameList
 
+#加载模型和数据提供给UI层
 def loading_data_and_models():
 
     category_index = loading_label_index()
@@ -324,6 +323,7 @@ def loading_data_and_models():
 
     return detection_graph,category_index
 
+#主要功能，实现detection和classification 以及将数据提供给UI层
 def location_and_claaification_vehicle(image_file_path,detection_graph,category_index):
 
     saveTrainResult = {}

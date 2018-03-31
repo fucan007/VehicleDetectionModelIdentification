@@ -62,12 +62,12 @@ class MyTable(QTableWidget):
             self.setItem(i, 4, QTableWidgetItem(str(H)))
 
             i = i + 1
-
+    #将表格之前的信息clear
     def deleteOldItem(self):
         for i in range(5):
             for j in range(5):
                 self.setItem(i,j, QTableWidgetItem(None))
-
+#线程类
 class  MyThread(QThread):
     sinOut = pyqtSignal(bool)
 
@@ -86,11 +86,11 @@ class  MyThread(QThread):
         self.start()
 
     def run(self):
+        #模型数据的加载
         detection_graph, category_index = loading_data_and_models()
         while 1:
             if self.startTraining == True:
-                ##发射信号
-                # 第二行将图像的路径和名称传入到底层然后取得图像内汽车的数目、将原图处理后的图像的路径和名称等等信息
+                # 将图像的路径和名称传入到底层然后取得图像内汽车的数目、将原图处理后的图像的路径和名称等等信息
                 prof = line_profiler.LineProfiler(location_and_claaification_vehicle)
                 prof.enable()  # 开始性能分析
 
@@ -104,10 +104,10 @@ class  MyThread(QThread):
                 prof.disable()  # 停止性能分析
                 prof.print_stats(sys.stdout)
 
-                self.startTraining = False
+                self.startTraining = False          #训练停止
                 self.endOfTraining = True
 
-                self.sinOut.emit(self.endOfTraining)
+                self.sinOut.emit(self.endOfTraining)#训练结束，发射信号告诉主线程
 
 class PictureWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -195,16 +195,17 @@ class PictureWindow(QtWidgets.QWidget):
         print (filetype)
         print (self.inputPictureName)
 
-    def stopApplication(self):
+    def stopApplication(self):#关闭程序
         app.exit(app.exec_())
 
 
-    def center(self):
+    def center(self):#居中
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    #选取一张图片，并且记录图片的路径和名称
     def displayPicture(self):
         print ('Enter function displayPicture and will display ',self.inputPictureName)
         try:
@@ -220,7 +221,6 @@ class PictureWindow(QtWidgets.QWidget):
             print (QMessageBox.Yes)
             qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
             if reply == QMessageBox.Yes:
-                #qDebug('From main thread: %s' % hex(int(QThread.currentThreadId())))
                 self.selectPicture()
         else:
             self.displayInputPictureLabel.setScaledContents(True)
@@ -228,6 +228,7 @@ class PictureWindow(QtWidgets.QWidget):
             self.displayOutputPictureLabel.setScaledContents(True)
             self.displayOutputPictureLabel.setPixmap(outputPixmap)
 
+    #显示车的类型
     def displayDetailPicture(self):
         try:
             # 读取文件转换成pixmap
@@ -245,7 +246,7 @@ class PictureWindow(QtWidgets.QWidget):
             self.displayInputPictureLabel.setScaledContents(True)#设置图片自适应
             self.displayInputPictureLabel.setPixmap(detailPixmap)#显示图片
 
-
+    #了解更详细的信息
     def informationImage(self):
         try:
             self.inputPictureName
@@ -282,7 +283,7 @@ class PictureWindow(QtWidgets.QWidget):
     def InferencePicture(self):
         self.thread.changeStatus(True,self.inputPictureName)
 
-
+    #当训练结束时，该函数会被调用，更新信息
     def updateUiInfo(self,status):
 
         self.endOfTraining = status
