@@ -239,7 +239,7 @@ def draw_eclipse_for_vehicle_classification(image,imageName,id_to_ob,imageInfo,d
 
     plt.imsave(imageName, image)
 
-def run_location_on_image(image,category_index):
+def run_location_on_image(image,category_index,detection_graph):
     object_car_num = 0
     imageInfo_to_box = {}
     imageFileNameList = []
@@ -270,16 +270,16 @@ def run_location_on_image(image,category_index):
             通过sess.run()我们获得了boxes, scores, classes, num_detections这些信息，那么调用下面这个函数则可以将这些信息全部画到
             图片上，但是这里我们仅需要和vehicle相关的信息，所以在此将起注释掉
             '''
-            # Visualization of the results of a detection.将识别结果标记在图片上
-            # vis_util.visualize_boxes_and_labels_on_image_array(
-            #     image_np,
-            #     np.squeeze(boxes),
-            #     np.squeeze(classes).astype(np.int32),
-            #     np.squeeze(scores),
-            #     category_index,
-            #     min_score_thresh=.4,
-            #     use_normalized_coordinates=True,
-            #     line_thickness=8)
+            #Visualization of the results of a detection.将识别结果标记在图片上
+            vis_util.visualize_boxes_and_labels_on_image_array(
+                image_np,
+                np.squeeze(boxes),
+                np.squeeze(classes).astype(np.int32),
+                np.squeeze(scores),
+                category_index,
+                min_score_thresh=.4,
+                use_normalized_coordinates=True,
+                line_thickness=8)
 
             box_to_color_map = find_object_dection_box(category_index,
                                                        np.squeeze(boxes),
@@ -306,30 +306,35 @@ def run_location_on_image(image,category_index):
             同info1
             如果需要图片内部全部信息则将一下注释打开
             '''
-            # output result输出
-            # for i in range(3):
-            #     if classes[0][i] in category_index.keys():
-            #         class_name = category_index[classes[0][i]]['name']
-            #     else:
-            #         class_name = 'N/A'
-            #     print("物体：%s 概率：%s" % (class_name, scores[0][i]))
+            #output result输出
+            for i in range(3):
+                if classes[0][i] in category_index.keys():
+                    class_name = category_index[classes[0][i]]['name']
+                else:
+                    class_name = 'N/A'
+                print("物体：%s 概率：%s" % (class_name, scores[0][i]))
 
-            #plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
+            plt.imsave(os.path.join(FLAGS.path_to_output_image, 'output.png'), image_np)
     return  object_car_num,imageInfo_to_box,imageFileNameList
 
+def loading_data_and_models():
 
-def location_and_claaification_vehicle(image_file_path):
+    category_index = loading_label_index()
+    detection_graph = loading_model_data()
+
+    return detection_graph,category_index
+
+def location_and_claaification_vehicle(image_file_path,detection_graph,category_index):
 
     saveTrainResult = {}
-    category_index = loading_label_index()
-    loading_model_data()
     image = Image.open(image_file_path)
 
-    object_car_num,imageInfo_to_box,imageFileNameList = run_location_on_image(image,category_index)
+    object_car_num,imageInfo_to_box,imageFileNameList = run_location_on_image(image,category_index,detection_graph)
 
     after_draw_rectangle_for_vehicle_detection = os.path.join(FLAGS.path_to_output_image, 'vehicle_detection.png')
     after_draw_eclipse_and_vehicleModel = os.path.join(FLAGS.path_to_output_image, 'vehicle_Model.png')
     image_copy = image.copy()
+
     for i in range(len(imageFileNameList)):
         print("序号：%s   值：%s" % (i + 1, imageFileNameList[i]))
         imageFileName = os.path.join(FLAGS.path_to_output_image, imageFileNameList[i])
